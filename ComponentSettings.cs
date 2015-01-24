@@ -20,7 +20,6 @@ namespace LiveSplit.UI.Components
             InitializeComponent();
 
             ScriptPath = "";
-
             txtScriptPath.DataBindings.Add("Text", this, "ScriptPath", false, DataSourceUpdateMode.OnPropertyChanged);
         }
 
