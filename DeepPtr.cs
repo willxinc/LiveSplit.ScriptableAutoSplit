@@ -144,18 +144,24 @@ namespace LiveSplit
         {
             Type type = typeof(T);
 
+            val = default(T);
             object val2;
-            var result = ReadProcessValue(process, addr, type, out val2);
+            if (!ReadProcessValue(process, addr, type, out val2))
+                return false;
+
             val = (T)val2;
 
-            return result;
+            return true;
         }
 
         static bool ReadProcessValue(Process process, IntPtr addr, Type type, out object val)
         {
             byte[] bytes;
 
-            var result = ReadProcessBytes(process, addr, Marshal.SizeOf(type), out bytes);
+            val = null;
+            int size  = type == typeof(bool) ? 1 : Marshal.SizeOf(type);
+            if (!ReadProcessBytes(process, addr, size, out bytes))
+                return false;
 
             val = ResolveToType(bytes, type);
 
@@ -202,7 +208,10 @@ namespace LiveSplit
             }
             else if (type == typeof(bool))
             {
-                val = (object)BitConverter.ToBoolean(bytes, 0);
+                if (bytes == null)
+                    val = false;
+                else
+                    val = (object)BitConverter.ToBoolean(bytes, 0);
             }
             else if (type == typeof(short))
             {

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
-using System.Linq;
-using System.Text;
 
 namespace LiveSplit.ASL
 {
@@ -102,7 +100,7 @@ namespace LiveSplit.ASL
                 pointer.Deref(p, out x, length);
                 return x;
             }
-            throw new ArgumentException("The provided type is not supported");
+            throw new ArgumentException(string.Format("The provided type, '{0}', is not supported", type));
         }
 
         public object Clone()

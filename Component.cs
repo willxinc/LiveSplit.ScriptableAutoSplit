@@ -2,22 +2,10 @@
 
 using LiveSplit.ASL;
 using LiveSplit.Model;
-using LiveSplit.Options;
-using LiveSplit.TimeFormatters;
-using LiveSplit.UI.Components;
-using LiveSplit.Web;
-using LiveSplit.Web.Share;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Dynamic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Timers;
 
 namespace LiveSplit.UI.Components
 {
@@ -36,6 +24,8 @@ namespace LiveSplit.UI.Components
         public float PaddingRight { get { return 0; } }
 
         protected String OldScriptPath { get; set; }
+        protected FileSystemWatcher FSWatcher { get; set; }
+        protected bool DoReload { get; set; }
 
         public bool Refresh { get; set; }
 
@@ -54,16 +44,24 @@ namespace LiveSplit.UI.Components
         public Component()
         {
             Settings = new ComponentSettings();
+            FSWatcher = new FileSystemWatcher();
+            FSWatcher.Changed += (sender, args) => DoReload = true;
         }
 
         public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
         {
-            if (Settings.ScriptPath != OldScriptPath)
+            if ((Settings.ScriptPath != OldScriptPath && !String.IsNullOrEmpty(Settings.ScriptPath)) || DoReload)
             {
                 Script = ASLParser.Parse(File.ReadAllText(Settings.ScriptPath));
                 OldScriptPath = Settings.ScriptPath;
+                FSWatcher.Path = Path.GetDirectoryName(Settings.ScriptPath);
+                FSWatcher.Filter = Path.GetFileName(Settings.ScriptPath);
+                FSWatcher.EnableRaisingEvents = true;
+                DoReload = false;
             }
-            Script.Update(state);
+
+            if (Script != null)
+                Script.Update(state);
         }
 
         public void DrawHorizontal(Graphics g, LiveSplitState state, float height, Region clipRegion)
@@ -111,6 +109,8 @@ namespace LiveSplit.UI.Components
 
         public void Dispose()
         {
+            if (FSWatcher != null)
+                FSWatcher.Dispose();
         }
     }
 }

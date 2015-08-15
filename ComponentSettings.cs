@@ -1,12 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using WinFormsColor;
 using System.Xml;
 
 namespace LiveSplit.UI.Components
@@ -23,33 +16,21 @@ namespace LiveSplit.UI.Components
             txtScriptPath.DataBindings.Add("Text", this, "ScriptPath", false, DataSourceUpdateMode.OnPropertyChanged);
         }
 
-        public System.Xml.XmlNode GetSettings(System.Xml.XmlDocument document)
+        public XmlNode GetSettings(XmlDocument document)
         {
             var settingsNode = document.CreateElement("Settings");
-            settingsNode.AppendChild(ToElement(document, "Version", "1.4"));
-            settingsNode.AppendChild(ToElement(document, "ScriptPath", ScriptPath));
+            settingsNode.AppendChild(SettingsHelper.ToElement(document, "Version", "1.4"));
+            settingsNode.AppendChild(SettingsHelper.ToElement(document, "ScriptPath", ScriptPath));
             return settingsNode;
         }
 
-        public void SetSettings(System.Xml.XmlNode settings)
+        public void SetSettings(XmlNode settings)
         {
             var element = (XmlElement)settings;
             if (!element.IsEmpty)
             {
-                Version version;
-                if (element["Version"] != null)
-                    version = Version.Parse(element["Version"].InnerText);
-                else
-                    version = new Version(1, 0, 0, 0);
-                ScriptPath = element["ScriptPath"].InnerText;
+                ScriptPath = SettingsHelper.ParseString(element["ScriptPath"], string.Empty);
             }
-        }
-
-        private XmlElement ToElement<T>(XmlDocument document, String name, T value)
-        {
-            var element = document.CreateElement(name);
-            element.InnerText = value.ToString();
-            return element;
         }
 
         private void btnSelectFile_Click(object sender, EventArgs e)

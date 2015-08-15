@@ -1,9 +1,6 @@
 ﻿using LiveSplit.Model;
 using LiveSplit.UI.Components;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 [assembly: ComponentFactory(typeof(Factory))]
 
@@ -49,7 +46,7 @@ namespace LiveSplit.UI.Components
 
         public Version Version
         {
-            get { return Version.Parse("1.0.0"); }
+            get { return Version.Parse("1.1.2"); }
         }
 
         public ComponentCategory Category
