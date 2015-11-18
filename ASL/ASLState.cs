@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
+using LiveSplit.ComponentUtil;
 
 namespace LiveSplit.ASL
 {
@@ -9,11 +10,13 @@ namespace LiveSplit.ASL
     {
         public ExpandoObject Data { get; set; }
         public List<ASLValueDefinition> ValueDefinitions { get; set; }
+        public string GameVersion { get; set; }
 
         public ASLState()
         {
             Data = new ExpandoObject();
             ValueDefinitions = new List<ASLValueDefinition>();
+            GameVersion = string.Empty;
         }
 
         public ASLState RefreshValues(Process p)
@@ -36,69 +39,35 @@ namespace LiveSplit.ASL
             return clone;
         }
 
-        private dynamic GetValue(Process p, String type, DeepPointer pointer)
+        private dynamic GetValue(Process p, string type, DeepPointer pointer)
         {
             if (type == "int")
-            {
-                int x;
-                pointer.Deref<int>(p, out x);
-                return x;
-            }
+                return pointer.Deref<int>(p);
             else if (type == "uint")
-            {
-                uint x;
-                pointer.Deref<uint>(p, out x);
-                return x;
-            }
+                return pointer.Deref<uint>(p);
             else if (type == "float")
-            {
-                float x;
-                pointer.Deref<float>(p, out x);
-                return x;
-            }
+                return pointer.Deref<float>(p);
             else if (type == "double")
-            {
-                double x;
-                pointer.Deref<double>(p, out x);
-                return x;
-            }
+                return pointer.Deref<double>(p);
             else if (type == "byte")
-            {
-                byte x;
-                pointer.Deref<byte>(p, out x);
-                return x;
-            }
-            else if (type == "bool")
-            {
-                bool x;
-                pointer.Deref<bool>(p, out x);
-                return x;
-            }
-            else if (type == "short")
-            {
-                short x;
-                pointer.Deref<short>(p, out x);
-                return x;
-            }
+                return pointer.Deref<byte>(p);
             else if (type == "sbyte")
-            {
-                sbyte x;
-                pointer.Deref<sbyte>(p, out x);
-                return x;
-            }
+                return pointer.Deref<sbyte>(p);
+            else if (type == "short")
+                return pointer.Deref<short>(p);
+            else if (type == "ushort")
+                return pointer.Deref<ushort>(p);
+            else if (type == "bool")
+                return pointer.Deref<bool>(p);
             else if (type.StartsWith("string"))
             {
-                String x;
-                var length = Int32.Parse(type.Substring("string".Length));
-                pointer.Deref(p, out x, length);
-                return x;
+                var length = int.Parse(type.Substring("string".Length));
+                return pointer.DerefString(p, length);
             }
             else if (type.StartsWith("byte"))
             {
-                byte[] x;
-                var length = Int32.Parse(type.Substring("byte".Length));
-                pointer.Deref(p, out x, length);
-                return x;
+                var length = int.Parse(type.Substring("byte".Length));
+                return pointer.DerefBytes(p, length);
             }
             throw new ArgumentException(string.Format("The provided type, '{0}', is not supported", type));
         }
@@ -106,7 +75,7 @@ namespace LiveSplit.ASL
         public object Clone()
         {
             var clone = new ExpandoObject();
-            foreach (var pair in (IDictionary<string, object>)Data)
+            foreach (var pair in Data)
             {
                 ((IDictionary<string, object>)clone).Add(pair);
             }

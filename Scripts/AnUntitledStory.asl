@@ -1,6 +1,6 @@
 state("Anuntitledstory")
 {
-	double time : "AnUntitledStory.exe", 0x00189720, 0x4, 0x358;
+	double time : 0x189720, 0x4, 0x358;
 
 	double boss1 : "AnUntitledStory.exe", 0x00189720, 0x4, 0x638, 0x30;
 	double boss2 : "AnUntitledStory.exe", 0x00189720, 0x4, 0x638, 0x48;
